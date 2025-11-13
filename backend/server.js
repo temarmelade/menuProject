@@ -10,7 +10,6 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Раздаём фронтенд (если он лежит в папке frontend на уровне выше backend)
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
 // --- API получения меню ---

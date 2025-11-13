@@ -1,7 +1,7 @@
 -- Таблица категорий (Чай, Кофе, Десерты)
 CREATE TABLE IF NOT EXISTS categories (
     id SERIAL PRIMARY KEY,
-    slug TEXT UNIQUE NOT NULL,        -- "coffee", "tea", "desserts"
+    slug TEXT UNIQUE NOT NULL,       
     name_ru TEXT NOT NULL,
     name_en TEXT NOT NULL,
     image_url TEXT
