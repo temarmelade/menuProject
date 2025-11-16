@@ -98,6 +98,8 @@ body {
     color: #6b7280;
 }
 
+
+
 .category-tabs {
     display: flex;
     gap: 8px;
@@ -221,6 +223,71 @@ body {
 .button.secondary {
     background: #e5e7eb;
     color: #111827;
+}
+
+.menu-top-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.back-btn {
+  align-self: flex-start;
+  border: none;
+  background: transparent;
+  color: #4b5563;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.back-btn:hover {
+  text-decoration: underline;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.category-card {
+  background: #ffffff;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow:
+    0 12px 24px rgba(15, 23, 42, 0.08),
+    0 1px 2px rgba(15, 23, 42, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.category-image-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 60%;
+  overflow: hidden;
+}
+
+.category-card img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.category-body {
+  padding: 10px 12px 12px;
+}
+
+.category-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: #111827;
 }
 
 @media (max-width: 640px) {
