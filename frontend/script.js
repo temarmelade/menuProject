@@ -1,19 +1,22 @@
 const app = document.getElementById("app");
 
 const state = {
-  lang: null,           
-  menuData: [],        
+  lang: null,           // 'ru' | 'en'
+  menuData: [],         // [{ id, name, imageUrl, items: [...] }]
   currentCategoryId: null,
 };
 
-// Загрузка меню с сервера
 async function loadMenu(lang) {
   state.lang = lang;
 
   try {
     const res = await fetch(`/api/menu?lang=${lang}`);
     state.menuData = await res.json();
-    state.currentCategoryId = null;
+
+    if (!state.currentCategoryId && state.menuData.length > 0) {
+      state.currentCategoryId = state.menuData[0].id;
+    }
+
     render();
   } catch (e) {
     console.error("Ошибка загрузки меню:", e);
@@ -24,47 +27,94 @@ async function loadMenu(lang) {
 function render() {
   if (!state.lang) {
     renderLanguageScreen();
-  } else if (!state.currentCategoryId) {
-    renderCategoriesScreen();
   } else {
-    renderItemsScreen();
+    renderMenuScreen();
   }
 }
 
-// ========== ЭКРАН ВЫБОРА ЯЗЫКА ==========
 function renderLanguageScreen() {
   app.innerHTML = `
-    <div class="screen">
-      <h1>Выберите язык / Choose language</h1>
-      <button class="button" onclick="loadMenu('ru')">Русский</button>
-      <button class="button secondary" onclick="loadMenu('en')">English</button>
+    <div class="language-screen">
+      <div class="brand">
+        <div class="brand-logo">☕️</div>
+        <div class="brand-text">
+          <div class="brand-title">T&E Coffee</div>
+        </div>
+      </div>
+
+      <div class="title">Выберите язык / Choose language</div>
+      <div class="buttons">
+        <button class="button" onclick="loadMenu('ru')">Русский</button>
+        <button class="button secondary" onclick="loadMenu('en')">English</button>
+      </div>
     </div>
   `;
 }
 
-// ========== ЭКРАН КАТЕГОРИЙ ==========
-function renderCategoriesScreen() {
+function renderMenuScreen() {
   const categories = state.menuData;
+
+  if (!categories || categories.length === 0) {
+    app.innerHTML = "<p>Меню пустое.</p>";
+    return;
+  }
+
+  if (!state.currentCategoryId) {
+    state.currentCategoryId = categories[0].id;
+  }
+
+  const activeCategory = categories.find(c => c.id === state.currentCategoryId) || categories[0];
 
   app.innerHTML = `
     <div class="screen">
-      <div class="nav-top">
-        <h1>${state.lang === 'ru' ? 'Категории' : 'Categories'}</h1>
-        <div class="lang-label">${state.lang === 'ru' ? 'Русский' : 'English'}</div>
+      <div class="header">
+        <div class="brand">
+          <div class="brand-logo">☕️</div>
+          <div class="brand-text">
+            <div class="brand-title">T&E Coffee</div>
+          </div>
+        </div>
+
+        <div class="lang-switch">
+          <button class="lang-btn ${state.lang === 'ru' ? 'active' : ''}" onclick="changeLanguage('ru')">RU</button>
+          <button class="lang-btn ${state.lang === 'en' ? 'active' : ''}" onclick="changeLanguage('en')">EN</button>
+        </div>
       </div>
 
-      <div class="grid">
+      <div class="menu-header">
+        <h1>${state.lang === 'ru' ? 'Меню' : 'Menu'}</h1>
+        <p>${state.lang === 'ru'
+      ? 'Выберите категорию и откройте для себя наши позиции.'
+      : 'Choose a category to explore our dishes and drinks.'}</p>
+      </div>
+
+      <div class="category-tabs">
         ${categories.map(cat => `
-          <div class="card" onclick="selectCategory(${cat.id})">
-            <img src="${cat.imageUrl}" alt="${cat.name}" loading="lazy" />
-            <div class="card-body">${cat.name}</div>
-          </div>
+          <button
+            class="category-tab ${cat.id === activeCategory.id ? 'active' : ''}"
+            onclick="selectCategory(${cat.id})"
+          >
+            ${cat.name}
+          </button>
         `).join('')}
       </div>
 
-      <button class="button secondary" onclick="changeLanguage()">
-        ${state.lang === 'ru' ? 'English version' : 'Русская версия'}
-      </button>
+      <div class="items-grid">
+        ${activeCategory.items.map(item => `
+          <div class="item-card">
+            <div class="item-image-wrapper">
+              <img src="${item.image_url || item.imageUrl}" alt="${item.name}" loading="lazy" />
+            </div>
+            <div class="item-body">
+              <div class="item-title-row">
+                <div class="item-name">${item.name}</div>
+                <div class="item-price">${item.price} ${state.lang === 'ru' ? 'сом' : 'KGS'}</div>
+              </div>
+              <div class="item-desc">${item.description || ''}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
     </div>
   `;
 }
@@ -74,59 +124,13 @@ function selectCategory(id) {
   render();
 }
 
-function changeLanguage() {
-  const newLang = state.lang === 'ru' ? 'en' : 'ru';
-  loadMenu(newLang);
+function changeLanguage(lang) {
+  if (lang === state.lang) return;
+  loadMenu(lang);
 }
-
-// ========== ЭКРАН ПОЗИЦИЙ КАТЕГОРИИ ==========
-function renderItemsScreen() {
-  const category = state.menuData.find(c => c.id === state.currentCategoryId);
-  if (!category) {
-    state.currentCategoryId = null;
-    render();
-    return;
-  }
-
-  app.innerHTML = `
-    <div class="screen">
-      <div class="nav-top">
-        <button class="back-btn" onclick="goBack()">
-          ${state.lang === 'ru' ? 'Назад' : 'Back'}
-        </button>
-        <div class="lang-label">${state.lang === 'ru' ? 'Русский' : 'English'}</div>
-      </div>
-
-      <div class="breadcrumbs">
-        ${state.lang === 'ru' ? 'Категории' : 'Categories'} › ${category.name}
-      </div>
-
-      <h2>${category.name}</h2>
-
-      <div class="item-list">
-        ${category.items.map(item => `
-          <div class="item-card">
-            <img src="${item.image_url || item.imageUrl}" alt="${item.name}" loading="lazy" />
-            <div class="item-info">
-              <div class="item-name">${item.name}</div>
-              <div class="item-desc">${item.description || ''}</div>
-              <div class="item-price">${item.price} ${state.lang === 'ru' ? 'сом' : 'KGS'}</div>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  `;
-}
-
-function goBack() {
-  state.currentCategoryId = null;
-  render();
-}
-
-render();
 
 window.loadMenu = loadMenu;
 window.selectCategory = selectCategory;
 window.changeLanguage = changeLanguage;
-window.goBack = goBack;
+
+render();
