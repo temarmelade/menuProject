@@ -21,9 +21,9 @@ TRUNCATE TABLE menu_items RESTART IDENTITY CASCADE;
 TRUNCATE TABLE categories RESTART IDENTITY CASCADE;
 
 INSERT INTO categories (slug, name_ru, name_en, image_url) VALUES
-                                                               ('coffee',  'Кофе',    'Coffee',   'https://images.pexels.com/photos/34085/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=600'),
+                                                               ('coffee',  'Кофе',    'Coffee',   'https://insanelygoodrecipes.com/wp-content/uploads/2020/07/Cup-Of-Creamy-Coffee.png'),
                                                                ('tea',     'Чай',     'Tea',      'https://images.pexels.com/photos/1417945/pexels-photo-1417945.jpeg?auto=compress&cs=tinysrgb&w=600'),
-                                                               ('desserts','Десерты', 'Desserts', 'https://images.pexels.com/photos/3026808/pexels-photo-3026808.jpeg?auto=compress&cs=tinysrgb&w=600');
+                                                               ('desserts','Десерты', 'Desserts', 'https://www.allrecipes.com/thmb/p4f6RaeEnKTJyE4PVm9dzyMKUMc=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/GettyImages-636266048-2000-4fe716c6d4584ec4b6ccab88125d4cef.jpg');
 
 INSERT INTO menu_items (category_id, name_ru, name_en, description_ru, description_en, price, image_url) VALUES
                                                                                                              (1, 'Латте', 'Latte',
@@ -43,9 +43,7 @@ INSERT INTO menu_items (category_id, name_ru, name_en, description_ru, descripti
                                                                                                               'Espresso, hot water',
                                                                                                               180,
                                                                                                               'https://coffe-spb.ru/img/cms/americano.jpg'),
-
-
-                                                                                                             (2, 'Черный чай', 'Black tea',
+(2, 'Черный чай', 'Black tea',
                                                                                                               'Классический черный чай',
                                                                                                               'Classic black tea',
                                                                                                               70,
@@ -74,8 +72,7 @@ INSERT INTO menu_items (category_id, name_ru, name_en, description_ru, descripti
                                                                                                               'Chocolate sponge cake, white chocolate mousse, dark chocolate mousse',
                                                                                                               220,
                                                                                                               'https://i.ytimg.com/vi/QtS9SG4T5EY/maxresdefault.jpg'),
-
-                                                                                                             (3, 'Красный бархат', 'Red velvet cake',
+                                                                                                              (3, 'Красный бархат', 'Red velvet cake',
                                                                                                               'Вкусный красный бархат',
                                                                                                               'Delicious red velvet cake',
                                                                                                               180,

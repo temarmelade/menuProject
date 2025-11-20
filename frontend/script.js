@@ -8,7 +8,6 @@ const state = {
     view: 'role',              // 'role' | 'language' | 'categories' | 'items' | 'admin'
 };
 
-// =============== ГЛАВНЫЙ РЕНДЕР ===============
 function render() {
     if (!state.role || state.view === 'role') {
         renderRoleScreen();
@@ -29,7 +28,6 @@ function render() {
     }
 }
 
-// =============== ВЫБОР РОЛИ ===============
 function renderRoleScreen() {
     state.view = 'role';
 
@@ -60,7 +58,7 @@ function setRole(role) {
         state.currentCategoryId = null;
         render();
     } else if (role === 'admin') {
-        state.lang = 'ru';         // админка по умолчанию в RU
+        state.lang = 'ru';        
         state.view = 'admin';
         loadMenu('ru', { forAdmin: true });
     }
@@ -75,7 +73,6 @@ function backToRole() {
     render();
 }
 
-// =============== ЗАГРУЗКА МЕНЮ С БЭКА ===============
 async function loadMenu(lang, options = {}) {
     state.lang = lang;
 
@@ -100,7 +97,6 @@ async function loadMenu(lang, options = {}) {
     }
 }
 
-// =============== ЭКРАН ВЫБОРА ЯЗЫКА (КЛИЕНТ) ===============
 function renderLanguageScreen() {
     state.view = 'language';
 
@@ -126,7 +122,6 @@ function renderLanguageScreen() {
   `;
 }
 
-// =============== МЕНЮ ДЛЯ ПОЛЬЗОВАТЕЛЯ ===============
 function renderMenuScreen() {
     const categories = state.menuData;
 
@@ -270,11 +265,9 @@ function changeLanguage(lang) {
     loadMenu(lang);
 }
 
-// =============== АДМИН-ПАНЕЛЬ ===============
 async function renderAdminScreen() {
     state.view = 'admin';
 
-    // если меню ещё не загружено – загрузим и снова вызовем этот экран
     if (!state.menuData || state.menuData.length === 0) {
         await loadMenu('ru', { forAdmin: true });
         return;
@@ -388,7 +381,6 @@ async function renderAdminScreen() {
   `;
 }
 
-// =============== АДМИН: ОБРАБОТЧИКИ ===============
 async function handleAddCategory() {
     const slug = document.getElementById('cat-slug').value.trim();
     const name_ru = document.getElementById('cat-name-ru').value.trim();
@@ -507,7 +499,6 @@ async function handleDeleteItem(id) {
     }
 }
 
-// =============== ГЛОБАЛЬНЫЕ ФУНКЦИИ ДЛЯ onclick ===============
 window.setRole = setRole;
 window.backToRole = backToRole;
 
@@ -522,5 +513,4 @@ window.handleDeleteCategory = handleDeleteCategory;
 window.handleAddItem = handleAddItem;
 window.handleDeleteItem = handleDeleteItem;
 
-// старт
 render();

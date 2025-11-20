@@ -10,10 +10,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// раздаём фронтенд
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
-// ================== API ДЛЯ ПОЛЬЗОВАТЕЛЯ (МЕНЮ) ==================
 app.get('/api/menu', async (req, res) => {
   const lang = req.query.lang === 'en' ? 'en' : 'ru';
 
@@ -60,9 +58,7 @@ app.get('/api/menu', async (req, res) => {
   }
 });
 
-// ================== ADMIN API: КАТЕГОРИИ ==================
 
-// (опционально) получить список категорий
 app.get('/api/categories', async (req, res) => {
   try {
     const result = await pool.query(
@@ -75,7 +71,7 @@ app.get('/api/categories', async (req, res) => {
   }
 });
 
-// добавить категорию
+
 app.post('/api/categories', async (req, res) => {
   const { slug, name_ru, name_en, image_url } = req.body;
 
@@ -98,7 +94,7 @@ app.post('/api/categories', async (req, res) => {
   }
 });
 
-// удалить категорию (из-за ON DELETE CASCADE удалятся и её позиции)
+
 app.delete('/api/categories/:id', async (req, res) => {
   const id = req.params.id;
 
@@ -111,9 +107,8 @@ app.delete('/api/categories/:id', async (req, res) => {
   }
 });
 
-// ================== ADMIN API: ПОЗИЦИИ ==================
 
-// добавить позицию
+
 app.post('/api/items', async (req, res) => {
   const {
     category_id,
@@ -153,7 +148,6 @@ app.post('/api/items', async (req, res) => {
   }
 });
 
-// удалить позицию
 app.delete('/api/items/:id', async (req, res) => {
   const id = req.params.id;
 
@@ -166,7 +160,6 @@ app.delete('/api/items/:id', async (req, res) => {
   }
 });
 
-// ================== ЗАПУСК СЕРВЕРА ==================
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
