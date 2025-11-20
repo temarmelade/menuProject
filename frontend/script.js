@@ -1,12 +1,17 @@
 const app = document.getElementById("app");
 
 const state = {
-    role: null,                // 'user' | 'admin' | null
-    lang: null,                // 'ru' | 'en'
-    menuData: [],              // [{ id, name, imageUrl, items: [...] }]
+    role: null,
+    lang: null,
+    menuData: [],
     currentCategoryId: null,
-    view: 'role',              // 'role' | 'language' | 'categories' | 'items' | 'admin'
+    view: 'role',
+    isAdminAuthenticated: false,      
+    adminLoginError: null,            
 };
+
+const ADMIN_LOGIN = 'admin';         
+const ADMIN_PASSWORD = '1212';        
 
 function render() {
     if (!state.role || state.view === 'role') {
@@ -24,7 +29,11 @@ function render() {
     }
 
     if (state.role === 'admin') {
-        renderAdminScreen();
+        if (!state.isAdminAuthenticated) { 
+            renderAdminLoginScreen();
+        } else {
+            renderAdminScreen();
+        }
     }
 }
 
@@ -58,9 +67,11 @@ function setRole(role) {
         state.currentCategoryId = null;
         render();
     } else if (role === 'admin') {
-        state.lang = 'ru';        
-        state.view = 'admin';
-        loadMenu('ru', { forAdmin: true });
+        state.lang = 'ru';
+        state.view = 'admin-login';       
+        state.isAdminAuthenticated = false; 
+        state.adminLoginError = null;       
+        render();
     }
 }
 
@@ -70,6 +81,8 @@ function backToRole() {
     state.menuData = [];
     state.currentCategoryId = null;
     state.view = 'role';
+    state.isAdminAuthenticated = false;   
+    state.adminLoginError = null;         
     render();
 }
 
@@ -163,14 +176,14 @@ function renderMenuScreen() {
         <h1>${state.lang === 'ru' ? 'Меню' : 'Menu'}</h1>
         <p>
           ${
-        state.view === 'categories'
-            ? (state.lang === 'ru'
-                ? 'Выберите категорию, чтобы посмотреть позиции.'
-                : 'Choose a category to see the items.')
-            : (state.lang === 'ru'
-                ? 'Выберите категорию или вернитесь ко всем категориям.'
-                : 'Choose a category or go back to all categories.')
-    }
+            state.view === 'categories'
+                ? (state.lang === 'ru'
+                    ? 'Выберите категорию, чтобы посмотреть позиции.'
+                    : 'Choose a category to see the items.')
+                : (state.lang === 'ru'
+                    ? 'Выберите категорию или вернитесь ко всем категориям.'
+                    : 'Choose a category or go back to all categories.')
+        }
         </p>
       </div>
 
@@ -265,6 +278,57 @@ function changeLanguage(lang) {
     loadMenu(lang);
 }
 
+function renderAdminLoginScreen() {
+    state.view = 'admin-login';
+
+    app.innerHTML = `
+    <div class="language-screen">
+      <div class="brand">
+        <div class="brand-logo">⚙️</div>
+        <div class="brand-text">
+          <div class="brand-title">Admin panel</div>
+          <div class="brand-subtitle">вход администратора</div>
+        </div>
+      </div>
+
+      <div class="title">Введите логин и пароль</div>
+
+      <div class="admin-login-form">
+        <input id="admin-login" type="text" placeholder="Логин" />
+        <input id="admin-password" type="password" placeholder="Пароль" />
+        <button class="button" onclick="handleAdminLogin()">Войти</button>
+        <button class="button secondary" style="margin-top:8px;" onclick="backToRole()">← Назад</button>
+        ${
+          state.adminLoginError
+            ? `<p style="color:#b91c1c; margin-top:8px; font-size:14px;">${state.adminLoginError}</p>`
+            : ''
+        }
+      </div>
+    </div>
+  `;
+}
+
+async function handleAdminLogin() {
+    const login = document.getElementById('admin-login').value.trim();
+    const password = document.getElementById('admin-password').value.trim();
+
+    if (!login || !password) {
+        state.adminLoginError = 'Заполните логин и пароль';
+        render();
+        return;
+    }
+
+    if (login === ADMIN_LOGIN && password === ADMIN_PASSWORD) {
+        state.isAdminAuthenticated = true;
+        state.adminLoginError = null;
+        await loadMenu('ru', { forAdmin: true });
+    } else {
+        state.adminLoginError = 'Неверный логин или пароль';
+        state.isAdminAuthenticated = false;
+        render();
+    }
+}
+
 async function renderAdminScreen() {
     state.view = 'admin';
 
@@ -294,7 +358,7 @@ async function renderAdminScreen() {
         <p>Добавляйте и удаляйте категории. При удалении категории удаляются все её позиции.</p>
       </div>
 
-      <!-- Форма добавления категории -->
+
       <div style="background:#fff; border-radius:12px; padding:12px; margin-bottom:16px; box-shadow:0 6px 12px rgba(15,23,42,0.12);">
         <h2 style="font-size:16px; margin-bottom:8px;">Добавить категорию</h2>
         <div style="display:grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap:8px;">
@@ -306,7 +370,7 @@ async function renderAdminScreen() {
         <button class="button" style="margin-top:10px;" onclick="handleAddCategory()">Добавить категорию</button>
       </div>
 
-      <!-- Список категорий -->
+
       <div style="background:#fff; border-radius:12px; padding:12px; box-shadow:0 6px 12px rgba(15,23,42,0.12); margin-bottom:24px;">
         <h2 style="font-size:16px; margin-bottom:8px;">Список категорий</h2>
         ${
@@ -329,7 +393,6 @@ async function renderAdminScreen() {
     }
       </div>
 
-      <!-- Блок позиций -->
       <div class="menu-header">
         <h1>Позиции</h1>
         <p>Добавляйте и удаляйте блюда/напитки.</p>
@@ -349,7 +412,6 @@ async function renderAdminScreen() {
         <button class="button" style="margin-top:10px;" onclick="handleAddItem()">Добавить позицию</button>
       </div>
 
-      <!-- Список позиций (кратко по категориям) -->
       <div style="margin-top:16px;">
         <h2 style="font-size:16px; margin-bottom:8px;">Все позиции (кратко)</h2>
         ${
@@ -512,5 +574,6 @@ window.handleAddCategory = handleAddCategory;
 window.handleDeleteCategory = handleDeleteCategory;
 window.handleAddItem = handleAddItem;
 window.handleDeleteItem = handleDeleteItem;
+window.handleAdminLogin = handleAdminLogin;   
 
 render();
